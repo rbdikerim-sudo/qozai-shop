@@ -20,63 +20,7 @@ DEFAULT_CONFIG = {
     "admin_password": "admin"
 }
 
-DEFAULT_ITEMS = [
-    {
-        "id": 1,
-        "title": "Grey Essential Hoodie",
-        "price": "45000",
-        "price_formatted": "45,000 ₸",
-        "badge": "-20%",
-        "sizes": "S, M, L, XL",
-        "colors": "Серый, Черный",
-        "specs": "80% хлопок, 20% полиэстер.",
-        "image": "item_1.png"
-    },
-    {
-        "id": 2,
-        "title": "Oversized Black Tee",
-        "price": "18000",
-        "price_formatted": "18,000 ₸",
-        "badge": "NEW",
-        "sizes": "M, L, XL",
-        "colors": "Черный, Белый",
-        "specs": "100% органический хлопок.",
-        "image": "item_2.png"
-    },
-    {
-        "id": 3,
-        "title": "Forest Green Zip Hoodie",
-        "price": "52000",
-        "price_formatted": "52,000 ₸",
-        "badge": "ONLY 3 LEFT",
-        "sizes": "S, M, L",
-        "colors": "Зеленый",
-        "specs": "90% хлопок, 10% эластан.",
-        "image": "item_3.png"
-    },
-    {
-        "id": 4,
-        "title": "Classic Cream Crewneck",
-        "price": "38000",
-        "price_formatted": "38,000 ₸",
-        "badge": "POPULAR",
-        "sizes": "S, M, L, XL",
-        "colors": "Кремовый",
-        "specs": "100% премиум хлопок.",
-        "image": "item_4.png"
-    },
-    {
-        "id": 5,
-        "title": "Dusty Rose Hoodie",
-        "price": "46000",
-        "price_formatted": "46,000 ₸",
-        "badge": "NEW",
-        "sizes": "XS, S, M",
-        "colors": "Розовый",
-        "specs": "85% хлопок, 15% полиэстер.",
-        "image": "item_5.png"
-    }
-]
+DEFAULT_ITEMS = []
 
 def load_items():
     if os.path.exists(DATA_FILE):
