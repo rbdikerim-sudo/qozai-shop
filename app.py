@@ -1,6 +1,5 @@
 import os
 import json
-import requests
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 
 app = Flask(__name__)
@@ -35,16 +34,14 @@ def save_config(cfg):
     with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
         json.dump(cfg, f, ensure_ascii=False, indent=4)
 
-DEFAULT_ITEMS = []
-
 def load_items():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, 'r', encoding='utf-8') as f:
             try:
                 return json.load(f)
             except:
-                return DEFAULT_ITEMS
-    return DEFAULT_ITEMS
+                return []
+    return []
 
 @app.route('/')
 def index():
@@ -192,4 +189,3 @@ def reviews():
 
 if __name__ == '__main__':
     app.run(debug=True)
-    
