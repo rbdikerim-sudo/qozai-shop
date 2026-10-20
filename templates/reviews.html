@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Отзывы покупателей — Qozai Shop</title>
+    <style>
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body { background: #fafafa; color: #111; }
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 25px 50px; background: #fff; border-bottom: 1px solid #eaeaea;
+        }
+        .logo { font-weight: 800; font-size: 22px; text-transform: uppercase; text-decoration: none; color: #111; }
+        .nav-links { display: flex; align-items: center; gap: 20px; }
+        .support-btn {
+            background: #f1f1f1; color: #111; padding: 8px 16px; border-radius: 20px;
+            font-size: 13px; font-weight: 600; text-decoration: none;
+        }
+        .container {
+            max-width: 1000px; margin: 40px auto; padding: 0 20px;
+        }
+        h2 { font-size: 28px; font-weight: 800; margin-bottom: 30px; text-align: center; }
+        
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .review-card {
+            background: #fff; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #eaeaea;
+            display: flex; flex-direction: column;
+        }
+        .review-card img {
+            width: 100%; height: 350px; object-fit: cover; background: #f0f0f0;
+        }
+        .review-content {
+            padding: 20px; font-size: 14px; color: #444; line-height: 1.5;
+        }
+        .empty-reviews {
+            text-align: center; color: #777; padding: 50px; font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="logo">Qozai Shop</a>
+        <div class="nav-links">
+            <a href="/reviews" style="text-decoration:none; color:#111; font-weight:600;">Отзывы</a>
+            <a href="https://t.me/romaa764" target="_blank" class="support-btn">Связаться с продавцом</a>
+            <a href="/" style="text-decoration:none; color:#111; font-weight:500;">← На главную</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Фото-отзывы наших клиентов</h2>
+        
+        <div class="reviews-grid" id="reviewsGrid">
+            {% if reviews %}
+                {% for rev in reviews %}
+                <div class="review-card">
+                    <img src="{{ url_for('static', filename='uploads/' + rev.image) }}" alt="Отзыв клиента">
+                    {% if rev.text %}
+                    <div class="review-content">
+                        {{ rev.text }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-reviews" style="grid-column: 1 / -1;">
+                    Пока нет отзывов. Скоро здесь появятся первые фото от наших покупателей!
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+</html>

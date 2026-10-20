@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина — Qozai Shop</title>
+    <style>
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body { background: #fafafa; color: #111; }
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 40px; background: #fff; border-bottom: 1px solid #eaeaea;
+            flex-wrap: wrap; gap: 15px;
+        }
+        .logo { font-weight: 800; font-size: 20px; text-transform: uppercase; text-decoration: none; color: #111; }
+        .nav-links { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .support-btn {
+            background: #f1f1f1; color: #111; padding: 8px 16px; border-radius: 20px;
+            font-size: 13px; font-weight: 600; text-decoration: none;
+        }
+        .container {
+            max-width: 800px; margin: 30px auto; background: #fff;
+            padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        h2 { margin-bottom: 20px; font-size: 22px; }
+        .cart-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 0; border-bottom: 1px solid #eee; font-size: 15px;
+            flex-wrap: wrap; gap: 10px;
+        }
+        .cart-item label { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .cart-item img {
+            width: 50px; height: 60px; object-fit: contain; background: #f8f8f8; border-radius: 6px; padding: 4px; border: 1px solid #eaeaea;
+        }
+        .item-info-text { display: flex; flex-direction: column; gap: 3px; }
+        .item-size-badge { font-size: 12px; color: #666; background: #f1f1f1; padding: 2px 8px; border-radius: 4px; width: fit-content; }
+        
+        .total-box {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 30px; font-size: 18px; font-weight: 700; border-top: 2px solid #eee; padding-top: 20px;
+            flex-wrap: wrap; gap: 15px;
+        }
+        .checkout-btn {
+            background: #111; color: #fff; border: none; padding: 14px 35px;
+            border-radius: 30px; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none;
+        }
+        .checkout-btn:hover { background: #333; }
+        .back-link { display: inline-block; margin-top: 20px; color: #666; text-decoration: none; font-size: 14px; }
+
+        @media (max-width: 768px) {
+            header { padding: 15px 20px; justify-content: center; }
+            .container { margin: 15px; padding: 20px; }
+            .cart-item { justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="logo">Qozai Shop</a>
+        <div class="nav-links">
+            <a href="https://t.me/romaa764" target="_blank" class="support-btn">Связаться с продавцом</a>
+            <a href="/" style="text-decoration:none; color:#111; font-weight:500;">← На главную</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Ваша корзина</h2>
+        <div id="cartList"></div>
+
+        <div class="total-box">
+            <span>Итого к оплате: <span id="cartTotal">0</span> ₸</span>
+            <button class="checkout-btn" onclick="goToCheckout()">Перейти к оформлению</button>
+        </div>
+        <a href="/" class="back-link">Продолжить покупки</a>
+    </div>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('qozai_cart')) || [];
+        const cartList = document.getElementById('cartList');
+
+        function renderCart() {
+            cartList.innerHTML = '';
+            if (cart.length === 0) {
+                cartList.innerHTML = '<p style="text-align:center; color:#777; padding:30px;">Ваша корзина пуста</p>';
+                document.getElementById('cartTotal').textContent = '0';
+                return;
+            }
+
+            let total = 0;
+            cart.forEach((item, index) => {
+                total += parseInt(item.price) || 0;
+                let imgSrc = item.image && item.image.startsWith('item_') 
+                    ? 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=150&q=80' 
+                    : `/static/uploads/${item.image}`;
+
+                let itemSize = item.size ? item.size : 'Стандарт';
+
+                cartList.innerHTML += `
+                    <div class="cart-item">
+                        <label>
+                            <input type="checkbox" class="cart-cb" checked data-index="${index}" onchange="calcTotal()">
+                            <img src="${imgSrc}" alt="${item.title}">
+                            <div class="item-info-text">
+                                <span><b>${item.title}</b></span>
+                                <span class="item-size-badge">Размер: ${itemSize}</span>
+                            </div>
+                        </label>
+                        <span>${item.price_formatted}</span>
+                    </div>
+                `;
+            });
+            calcTotal();
+        }
+
+        function calcTotal() {
+            const checkboxes = document.querySelectorAll('.cart-cb');
+            let total = 0;
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    let idx = cb.getAttribute('data-index');
+                    total += parseInt(cart[idx].price) || 0;
+                }
+            });
+            document.getElementById('cartTotal').textContent = total.toLocaleString();
+        }
+
+        function goToCheckout() {
+            const checkboxes = document.querySelectorAll('.cart-cb:checked');
+            if (checkboxes.length === 0) {
+                alert('Выберите хотя бы один товар для заказа!');
+                return;
+            }
+            let selected = [];
+            checkboxes.forEach(cb => {
+                selected.push(cart[cb.getAttribute('data-index')]);
+            });
+            localStorage.setItem('qozai_checkout_items', JSON.stringify(selected));
+            window.location.href = '/checkout';
+        }
+
+        renderCart();
+    </script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админ-панель — Qozai Shop</title>
+    <style>
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body { background: #f4f5f7; padding: 40px 20px; color: #111; }
+        .wrapper { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; }
+        .card {
+            background: #fff; padding: 35px; border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+        }
+        h2 { margin-bottom: 20px; font-size: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
+        input[type="text"], input[type="password"], textarea, input[type="file"] {
+            width: 100%; padding: 10px 12px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 14px; box-sizing: border-box;
+        }
+        button {
+            background: #111; color: #fff; border: none; padding: 12px;
+            width: 100%; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 15px;
+            margin-top: 5px;
+        }
+        button:hover { background: #333; }
+        .logout-btn { display: block; text-align: center; margin-bottom: 20px; color: #d9534f; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .logout-btn:hover { text-decoration: underline; }
+        .back-link { display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        
+        <a href="/admin-logout" class="logout-btn">🚪 Выйти из админ-панели</a>
+
+        <!-- НАСТРОЙКИ TELEGRAM, ПАРОЛЯ И КАСПИ QR -->
+        <div class="card">
+            <h2>Настройки магазина (@romaa764)</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="save_config">
+                <div class="form-group">
+                    <label>Telegram Bot Token:</label>
+                    <input type="text" name="telegram_token" value="{{ config.telegram_token }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Telegram Chat ID:</label>
+                    <input type="text" name="telegram_chat_id" value="{{ config.telegram_chat_id }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Новый пароль администратора (оставьте пустым, если не нужно менять):</label>
+                    <input type="password" name="admin_password" placeholder="Введите новый пароль">
+                </div>
+                <div class="form-group">
+                    <label>Ваш Kaspi QR (изображение):</label>
+                    <input type="file" name="kaspi_qr" accept="image/*">
+                </div>
+                <button type="submit">Сохранить настройки</button>
+            </form>
+        </div>
+
+        <!-- ЗАГРУЗКА ОТЗЫВА -->
+        <div class="card">
+            <h2>Добавить фото-отзыв</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="add_review">
+                <div class="form-group">
+                    <label>Фото отзыва (скриншот или фото):</label>
+                    <input type="file" name="review_image" accept="image/*" required>
+                </div>
+                <div class="form-group">
+                    <label>Комментарий / Имя клиента (необязательно):</label>
+                    <textarea name="review_text" rows="2" placeholder="Например: 'Спасибо большое за худи, качество топ!'"></textarea>
+                </div>
+                <button type="submit">Опубликовать отзыв</button>
+            </form>
+        </div>
+
+        <!-- ДОБАВЛЕНИЕ ТОВАРА -->
+        <div class="card">
+            <h2>Добавить новый товар на рейл</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Название одежды:</label>
+                    <input type="text" name="title" required placeholder="Например: Oversized Hoodie">
+                </div>
+                <div class="form-group">
+                    <label>Цена (только цифры):</label>
+                    <input type="text" name="price" required placeholder="45000">
+                </div>
+                <div class="form-group">
+                    <label>Размеры:</label>
+                    <input type="text" name="sizes" required placeholder="S, M, L, XL">
+                </div>
+                <div class="form-group">
+                    <label>Цвета:</label>
+                    <input type="text" name="colors" required placeholder="Черный, Серый">
+                </div>
+                <div class="form-group">
+                    <label>Характеристики / Состав:</label>
+                    <input type="text" name="specs" required placeholder="100% хлопок, премиум флис">
+                </div>
+                <div class="form-group">
+                    <label>Бейдж (опционально):</label>
+                    <input type="text" name="badge" placeholder="NEW / -20% / POPULAR">
+                </div>
+                <div class="form-group">
+                    <label>Фото одежды (на белом фоне):</label>
+                    <input type="file" name="image" accept="image/*" required>
+                </div>
+                <button type="submit">Добавить товар</button>
+            </form>
+            <a href="/" class="back-link">← Вернуться в магазин</a>
+        </div>
+
+    </div>
+</body>
+</html>
+
