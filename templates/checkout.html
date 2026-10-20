@@ -4,31 +4,63 @@
     <meta charset="UTF-8">
     <title>Оформление заказа — Qozai Shop</title>
     <style>
-        body { font-family: sans-serif; background: #f9f9f9; padding: 40px; }
-        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; }
-        .btn-kaspi { display: inline-block; background: #f14635; color: white; padding: 16px 32px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 18px; margin: 20px 0; }
+        body { font-family: sans-serif; background: #f9f9f9; padding: 40px; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { text-align: center; margin-top: 0; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-kaspi { display: block; text-align: center; background: #f14635; color: white; padding: 14px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 16px; margin: 15px 0 25px 0; }
         .btn-kaspi:hover { background: #d93829; }
+        .submit-btn { background: #000; color: #fff; border: none; padding: 14px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; }
+        .submit-btn:hover { background: #333; }
     </style>
 </head>
 <body>
     <div class="container">
         {% if success %}
-            <h1>Спасибо за заказ!</h1>
-            <p>Мы скоро свяжемся с вами для подтверждения доставки.</p>
-            <a href="/" style="display: inline-block; margin-top: 20px; color: #000; font-weight: bold;">Вернуться в магазин</a>
+            <div style="text-align: center;">
+                <h1>Спасибо за заказ!</h1>
+                <p style="color: #666; margin-bottom: 20px;">Ваш заказ успешно оформлен и отправлен администратору. Мы скоро свяжемся с вами.</p>
+                <a href="/" style="color: #000; font-weight: bold; text-decoration: none;">← Вернуться в магазин</a>
+            </div>
         {% else %}
-            <h1>Оплата заказа</h1>
-            <p style="color: #666;">Нажмите на кнопку ниже, чтобы перейти к оплате через Kaspi:</p>
+            <h1>Оформление заказа</h1>
+            <p style="color: #666; text-align: center; margin-bottom: 30px;">Заполните данные для доставки и совершите оплату.</p>
             
-            <a href="{{ config.payment_link }}" target="_blank" class="btn-kaspi">
-                Оплатить через Kaspi ₸
-            </a>
+            <form action="/checkout" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Ваше имя:</label>
+                    <input type="text" name="name" required placeholder="Введите ваше имя">
+                </div>
+                
+                <div class="form-group">
+                    <label>Номер телефона:</label>
+                    <input type="text" name="phone" required placeholder="+7 (700) 000-00-00">
+                </div>
 
-            <form action="/checkout" method="POST" enctype="multipart/form-data" style="margin-top: 30px;">
-                <button type="submit" style="background: #000; color: #fff; border: none; padding: 12px 25px; border-radius: 6px; font-weight: bold; cursor: pointer;">Заказ оплачен, завершить</button>
+                <div class="form-group">
+                    <label>Адрес доставки:</label>
+                    <input type="text" name="address" required placeholder="Город, улица, дом, квартира">
+                </div>
+
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px solid #eaeaea;">
+                    <label style="margin-bottom: 5px;">Шаг 1. Оплата заказа:</label>
+                    <p style="font-size: 14px; color: #666; margin-top: 0;">Нажмите на кнопку ниже, чтобы перейти к оплате через Kaspi Pay:</p>
+                    <a href="{{ config.payment_link }}" target="_blank" class="btn-kaspi">
+                        Оплатить через Kaspi ₸
+                    </a>
+
+                    <label style="margin-bottom: 5px;">Шаг 2. Загрузка чека:</label>
+                    <p style="font-size: 14px; color: #666; margin-top: 0;">После успешной оплаты загрузите скриншот чека:</p>
+                    <input type="file" name="receipt" required style="padding: 8px; background: #fff;">
+                </div>
+
+                <button type="submit" class="submit-btn">Подтвердить и отправить заказ</button>
             </form>
-            <div style="margin-top: 20px;">
-                <a href="/cart" style="color: #666; text-decoration: none;">← Вернуться в корзину</a>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="/cart" style="color: #666; text-decoration: none; font-size: 14px;">← Вернуться в корзину</a>
             </div>
         {% endif %}
     </div>

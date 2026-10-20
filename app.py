@@ -1,5 +1,6 @@
 import os
 import json
+import requests
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 
 app = Flask(__name__)
@@ -171,8 +172,41 @@ def add_to_cart():
 def checkout():
     config = load_config()
     if request.method == 'POST':
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        address = request.form.get('address')
+        receipt_file = request.files.get('receipt')
+        
+        cart_items = session.get('cart', [])
+        
+        token = config.get('telegram_token')
+        chat_id = config.get('telegram_chat_id')
+        
+        if token and chat_id:
+            cart_text = "\n".join([f"- {i['title']} (Размер: {i['size']}, Цена: {i['price']})" for i in cart_items])
+            message = f"🛍 Новый заказ в Qozai Shop!\n\nИмя: {name}\nТелефон: {phone}\nАдрес: {address}\n\nТовары:\n{cart_text}"
+            
+            try:
+                if receipt_file and receipt_file.filename:
+                    receipt_path = os.path.join(UPLOAD_FOLDER, f"receipt_{receipt_file.filename}")
+                    receipt_file.save(receipt_path)
+                    with open(receipt_path, 'rb') as photo:
+                        requests.post(
+                            f"https://api.telegram.org/bot{token}/sendPhoto",
+                            data={"chat_id": chat_id, "caption": message},
+                            files={"photo": photo}
+                        )
+                else:
+                    requests.post(
+                        f"https://api.telegram.org/bot{token}/sendMessage",
+                        json={"chat_id": chat_id, "text": message}
+                    )
+            except Exception as e:
+                print("Telegram error:", e)
+
         session['cart'] = []
         return render_template('checkout.html', success=True, config=config)
+        
     return render_template('checkout.html', success=False, config=config)
 
 @app.route('/reviews')

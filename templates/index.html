@@ -122,14 +122,13 @@
             border-radius: 12px 12px 0 0;
             margin: 0 auto -2px auto;
         }
-        /* МАГИЯ УДАЛЕНИЯ БЕЛОГО ФОНА: mix-blend-mode убирает белый цвет */
         .wardrobe-item img {
             max-height: 220px;
             width: auto;
             object-fit: contain;
             display: block;
             margin: 0 auto;
-            mix-blend-mode: multiply; 
+            mix-blend-mode: multiply;
             filter: drop-shadow(0 15px 15px rgba(0,0,0,0.15));
         }
         .wardrobe-title {
@@ -158,7 +157,6 @@
             flex: 1;
             text-align: center;
         }
-        /* Убран белый фон с превьюшки тоже через mix-blend-mode */
         .product-preview-img img {
             max-height: 520px;
             width: 100%;
@@ -228,6 +226,30 @@
             color: #666;
             font-size: 18px;
         }
+
+        /* Стили для красивого всплывающего уведомления (тост) */
+        #toast-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #111;
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            font-weight: 500;
+            font-size: 15px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        #toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         @media(max-width: 768px) {
             .product-details-container {
                 flex-direction: column;
@@ -241,6 +263,8 @@
     </style>
 </head>
 <body>
+    <div id="toast-notification">Товар успешно добавлен в корзину! 🛍️</div>
+
     <header>
         <a href="/" class="logo">QOZAI SHOP</a>
         <nav>
@@ -325,6 +349,14 @@
             selectItem(currentItem);
         }
 
+        function showToast() {
+            let toast = document.getElementById('toast-notification');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
         function addToCart() {
             if (!currentItem) return;
             fetch('/add-to-cart', {
@@ -332,12 +364,12 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: currentItem.id, size: selectedSize })
             }).then(res => res.json()).then(data => {
-                alert('Товар успешно добавлен в корзину!');
+                showToast();
                 if(data.count !== undefined) {
                     document.getElementById('cart-count').innerText = data.count;
                 }
             }).catch(err => {
-                alert('Товар добавлен в корзину!');
+                showToast();
             });
         }
     </script>
