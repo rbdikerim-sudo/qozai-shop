@@ -21,12 +21,12 @@
         {% if success %}
             <div style="text-align: center;">
                 <h1>Спасибо за заказ!</h1>
-                <p style="color: #666; margin-bottom: 20px;">Ваш заказ успешно оформлен и отправлен администратору. Мы скоро свяжемся с вами.</p>
+                <p style="color: #666; margin-bottom: 20px;">Ваш заказ успешно оформлен и отправлен администратору в Telegram. Мы скоро свяжемся с вами.</p>
                 <a href="/" style="color: #000; font-weight: bold; text-decoration: none;">← Вернуться в магазин</a>
             </div>
         {% else %}
             <h1>Оформление заказа</h1>
-            <p style="color: #666; text-align: center; margin-bottom: 30px;">Заполните данные для доставки и совершите оплату.</p>
+            <p style="color: #666; text-align: center; margin-bottom: 30px;">Заполните контакты, оплатите заказ и загрузите чек.</p>
             
             <form action="/checkout" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
@@ -35,12 +35,22 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Номер телефона:</label>
-                    <input type="text" name="phone" required placeholder="+7 (700) 000-00-00">
+                    <label>💬 WhatsApp аккаунт / номер:</label>
+                    <input type="text" name="whatsapp" required placeholder="+7 (700) 000-00-00">
                 </div>
 
                 <div class="form-group">
-                    <label>Адрес доставки:</label>
+                    <label>📸 Instagram аккаунт:</label>
+                    <input type="text" name="instagram" placeholder="@username">
+                </div>
+
+                <div class="form-group">
+                    <label>✈️ Telegram аккаунт:</label>
+                    <input type="text" name="telegram" placeholder="@username">
+                </div>
+
+                <div class="form-group">
+                    <label>📍 Адрес доставки:</label>
                     <input type="text" name="address" required placeholder="Город, улица, дом, квартира">
                 </div>
 

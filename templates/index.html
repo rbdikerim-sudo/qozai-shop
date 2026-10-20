@@ -54,7 +54,6 @@
             font-weight: 600;
         }
 
-        /* Премиальная секция с рейлом и фоном */
         .wardrobe-section {
             background: linear-gradient(135deg, #f4f1ea 0%, #e2ded4 100%);
             padding: 60px 0 80px 0;
@@ -72,7 +71,6 @@
             font-weight: 700;
         }
 
-        /* Металлическая труба рейла */
         .rail-container {
             position: relative;
             width: 100%;
@@ -80,6 +78,7 @@
             white-space: nowrap;
             padding: 30px 0;
             scrollbar-width: thin;
+            perspective: 1000px;
         }
         .rail-container::before {
             content: '';
@@ -104,14 +103,13 @@
             display: inline-block;
             text-align: center;
             cursor: pointer;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            vertical-align: top;
             width: 160px;
+            vertical-align: top;
+            transition: transform 0.3s ease;
         }
         .wardrobe-item:hover {
-            transform: translateY(12px) scale(1.03);
+            transform: translateY(8px);
         }
-        /* Крючок вешалки */
         .wardrobe-item::before {
             content: '';
             display: block;
@@ -122,15 +120,23 @@
             border-radius: 12px 12px 0 0;
             margin: 0 auto -2px auto;
         }
+        
+        /* РЕАЛИСТИЧНЫЙ ВИД: по умолчанию стоят боком (поворот), при активном клике смотрят лицом (rotateY(0deg)) */
         .wardrobe-item img {
             max-height: 220px;
             width: auto;
             object-fit: contain;
             display: block;
             margin: 0 auto;
-            mix-blend-mode: multiply;
-            filter: drop-shadow(0 15px 15px rgba(0,0,0,0.15));
+            transform: rotateY(55deg) scale(0.9);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s;
+            filter: drop-shadow(10px 15px 15px rgba(0,0,0,0.2));
         }
+        .wardrobe-item.active-rail-item img {
+            transform: rotateY(0deg) scale(1.05);
+            filter: drop-shadow(0 20px 20px rgba(0,0,0,0.3));
+        }
+
         .wardrobe-title {
             font-size: 14px;
             font-weight: 600;
@@ -140,7 +146,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Детальный просмотр товара снизу */
         .product-details-container {
             max-width: 1000px;
             margin: 60px auto 100px auto;
@@ -162,7 +167,6 @@
             width: 100%;
             object-fit: contain;
             border-radius: 16px;
-            mix-blend-mode: multiply;
         }
         .product-info {
             flex: 1;
@@ -227,7 +231,6 @@
             font-size: 18px;
         }
 
-        /* Стили для красивого всплывающего уведомления (тост) */
         #toast-notification {
             position: fixed;
             bottom: 30px;
@@ -282,7 +285,7 @@
         <div class="rail-container">
             <div class="rail" id="rail">
                 {% for item in items %}
-                <div class="wardrobe-item" onclick="selectItem({{ item | tojson }})">
+                <div class="wardrobe-item {% if loop.first %}active-rail-item{% endif %}" onclick="selectItem({{ item | tojson }}, this)">
                     <img src="{{ url_for('static', filename='uploads/' + item.image) }}" alt="{{ item.title }}">
                     <div class="wardrobe-title">{{ item.title }}</div>
                 </div>
@@ -319,13 +322,19 @@
         let currentItem = {{ items[0] | tojson if items else 'null' }};
         let selectedSize = '';
 
-        function selectItem(item) {
+        function selectItem(item, element) {
             currentItem = item;
             document.getElementById('detail-img').src = "/static/uploads/" + item.image;
             document.getElementById('detail-title').innerText = item.title;
             document.getElementById('detail-price').innerText = item.price_format || (item.price + ' ₸');
             document.getElementById('detail-specs').innerText = item.specs || '';
             
+            // Управляем анимацией поворота вешалки
+            document.querySelectorAll('.wardrobe-item').forEach(el => el.classList.remove('active-rail-item'));
+            if (element) {
+                element.classList.add('active-rail-item');
+            }
+
             let sizesContainer = document.getElementById('detail-sizes');
             sizesContainer.innerHTML = '';
             if (item.sizes) {
@@ -346,7 +355,8 @@
         }
 
         if (currentItem) {
-            selectItem(currentItem);
+            let firstEl = document.querySelector('.wardrobe-item');
+            selectItem(currentItem, firstEl);
         }
 
         function showToast() {

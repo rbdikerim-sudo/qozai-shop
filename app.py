@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+from PIL import Image
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 
 app = Flask(__name__)
@@ -14,8 +15,8 @@ REVIEWS_FILE = 'reviews.json'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 DEFAULT_CONFIG = {
-    "telegram_token": "8867412750:AAFrtst2i-g2XqiH6i8oJDMq5Kop3sM4U0",
-    "telegram_chat_id": "8107168786",
+    "telegram_token": "",
+    "telegram_chat_id": "",
     "admin_password": "admin",
     "gis_link": "https://2gis.kz",
     "payment_link": "https://pay.kaspi.kz"
@@ -68,10 +69,26 @@ def admin_panel():
         image_filename = ''
         if file and file.filename:
             import uuid
-            ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else 'png'
-            image_filename = f"clothing_{uuid.uuid4().hex[:8]}.{ext}"
-            filepath = os.path.join(UPLOAD_FOLDER, image_filename)
-            file.save(filepath)
+            try:
+                # Автоматическое удаление белого фона через Pillow
+                img = Image.open(file.stream).convert("RGBA")
+                data = img.getdata()
+                new_data = []
+                for item in data:
+                    if item[0] > 220 and item[1] > 220 and item[2] > 220:
+                        new_data.append((255, 255, 255, 0))
+                    else:
+                        new_data.append(item)
+                img.putdata(new_data)
+                
+                image_filename = f"clothing_{uuid.uuid4().hex[:8]}.png"
+                filepath = os.path.join(UPLOAD_FOLDER, image_filename)
+                img.save(filepath, "PNG")
+            except Exception as e:
+                ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else 'png'
+                image_filename = f"clothing_{uuid.uuid4().hex[:8]}.{ext}"
+                filepath = os.path.join(UPLOAD_FOLDER, image_filename)
+                file.save(filepath)
 
         new_item = {
             "id": items[-1]['id'] + 1 if items else 1,
@@ -121,6 +138,8 @@ def update_config():
     config = load_config()
     config['gis_link'] = request.form.get('gis_link', config['gis_link'])
     config['payment_link'] = request.form.get('payment_link', config['payment_link'])
+    config['telegram_token'] = request.form.get('telegram_token', config['telegram_token'])
+    config['telegram_chat_id'] = request.form.get('telegram_chat_id', config['telegram_chat_id'])
     config['admin_password'] = request.form.get('admin_password', config['admin_password'])
     save_config(config)
     return redirect(url_for('admin_panel'))
@@ -147,7 +166,13 @@ def admin_logout():
 def cart():
     config = load_config()
     cart_items = session.get('cart', [])
-    return render_template('cart.html', cart_items=cart_items, config=config)
+    items = load_items()
+    valid_identifiers = {(str(i.get('id')), i.get('title')) for i in items}
+    
+    # Очищаем корзину от товаров, которые были удалены из каталога
+    cleaned_cart = [ci for ci in cart_items if (str(ci.get('id')), ci.get('title')) in valid_identifiers]
+    session['cart'] = cleaned_cart
+    return render_template('cart.html', cart_items=cleaned_cart, config=config)
 
 @app.route('/add-to-cart', methods=['POST'])
 def add_to_cart():
@@ -159,6 +184,7 @@ def add_to_cart():
     if target_item:
         cart = session.get('cart', [])
         cart.append({
+            "id": target_item['id'],
             "title": target_item['title'],
             "price": target_item.get('price_formatted', target_item['price']),
             "size": size,
@@ -173,7 +199,9 @@ def checkout():
     config = load_config()
     if request.method == 'POST':
         name = request.form.get('name')
-        phone = request.form.get('phone')
+        whatsapp = request.form.get('whatsapp')
+        instagram = request.form.get('instagram')
+        telegram_acc = request.form.get('telegram')
         address = request.form.get('address')
         receipt_file = request.files.get('receipt')
         
@@ -184,7 +212,7 @@ def checkout():
         
         if token and chat_id:
             cart_text = "\n".join([f"- {i['title']} (Размер: {i['size']}, Цена: {i['price']})" for i in cart_items])
-            message = f"🛍 Новый заказ в Qozai Shop!\n\nИмя: {name}\nТелефон: {phone}\nАдрес: {address}\n\nТовары:\n{cart_text}"
+            message = f"🛍 Новый заказ в Qozai Shop!\n\n👤 Имя: {name}\n💬 WhatsApp: {whatsapp}\n📸 Instagram: {instagram}\n✈️ Telegram: {telegram_acc}\n📍 Адрес: {address}\n\n📦 Товары:\n{cart_text}"
             
             try:
                 if receipt_file and receipt_file.filename:

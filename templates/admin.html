@@ -28,9 +28,9 @@
             </div>
         </div>
 
-        <!-- Настройки ссылок (2GIS и Оплата) -->
+        <!-- Настройки ссылок и Telegram -->
         <div style="background: #fafafa; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #eee;">
-            <h3 style="margin-top: 0;">⚙️ Настройки ссылок и доступов</h3>
+            <h3 style="margin-top: 0;">⚙️ Настройки магазина, 2GIS и Telegram</h3>
             <form action="/update-config" method="POST">
                 <div class="form-group">
                     <label>📍 Ссылка на магазин в 2GIS:</label>
@@ -39,6 +39,14 @@
                 <div class="form-group">
                     <label>💳 Ссылка на онлайн-оплату (Kaspi Pay / перевод):</label>
                     <input type="text" name="payment_link" value="{{ config.payment_link }}">
+                </div>
+                <div class="form-group">
+                    <label>🤖 Токен Telegram бота:</label>
+                    <input type="text" name="telegram_token" value="{{ config.telegram_token }}" placeholder="Введите токен бота">
+                </div>
+                <div class="form-group">
+                    <label>👤 Telegram Chat ID (куда отправлять заказы):</label>
+                    <input type="text" name="telegram_chat_id" value="{{ config.telegram_chat_id }}" placeholder="Введите ваш chat ID">
                 </div>
                 <div class="form-group">
                     <label>🔑 Пароль администратора:</label>
@@ -50,7 +58,7 @@
 
         <!-- Добавление нового товара -->
         <div style="background: #fafafa; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #eee;">
-            <h3 style="margin-top: 0;">➕ Добавить новый товар</h3>
+            <h3 style="margin-top: 0;">➕ Добавить новый товар (фон удалится автоматически)</h3>
             <form action="/admin" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>Название товара:</label>
@@ -73,7 +81,7 @@
                     <textarea name="specs">100% хлопок, Oversized крой.</textarea>
                 </div>
                 <div class="form-group">
-                    <label>Фотография товара:</label>
+                    <label>Фотография товара (на белом фоне):</label>
                     <input type="file" name="image" required>
                 </div>
                 <button type="submit">Добавить товар на витрину</button>
