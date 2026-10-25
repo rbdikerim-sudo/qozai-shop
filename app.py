@@ -586,6 +586,15 @@ def admin_logout():
   return redirect("/")
 
 
+app = Flask(__name__)
+app.secret_key = "qozai_secret_key_super_secure"
+DATABASE = "database.db"
+UPLOAD_FOLDER = "static/uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# СРАЗУ ЗАПУСКАЕМ ИНИЦИАЛИЗАЦИЮ БАЗЫ (теперь она сработает и на Render, и локально)
+init_db()
+
+
 if __name__ == "__main__":
-  init_db()
-  app.run(debug=True)
+    app.run(debug=True)
