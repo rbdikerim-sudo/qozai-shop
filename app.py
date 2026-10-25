@@ -100,7 +100,6 @@ def init_db():
           ),
       )
     else:
-      # Если колонка admin_password уже была, но пустая
       try:
         db.execute(
             "UPDATE settings SET admin_password = COALESCE(admin_password,"
@@ -529,8 +528,22 @@ def admin_panel():
       composition = request.form.get("composition")
       sizes_en = request.form.get("sizes_en")
       sizes_ru = request.form.get("sizes_ru")
-      image_url = request.form.get("image_url")
       code = f"CODE-{random.randint(10000, 99999)}"
+
+      # ИЗМЕНЕНИЕ: Обработка загрузки файла фото из устройства вместо текстовой ссылки
+      image_url = ""
+      if "image_file" in request.files:
+        file = request.files["image_file"]
+        if file and file.filename != "":
+          ext = (
+              file.filename.rsplit(".", 1)[1].lower()
+              if "." in file.filename
+              else "jpg"
+          )
+          filename = f"prod_{random.randint(10000, 99999)}.{ext}"
+          filepath = os.path.join(UPLOAD_FOLDER, filename)
+          file.save(filepath)
+          image_url = f"static/uploads/{filename}"
 
       db.execute(
           """

@@ -76,7 +76,8 @@
             <!-- Добавление товара -->
             <div class="admin-card full-width">
                 <h2>Добавить новый товар</h2>
-                <form method="POST">
+                <!-- ОБЯЗАТЕЛЬНО добавлен enctype="multipart/form-data для отправки файлов -->
+                <form method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="action" value="add_product">
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -121,8 +122,9 @@
                     <label>Состав ткани:</label>
                     <input type="text" name="composition" required placeholder="Хлопок 90%, Полиэстер 10%">
 
-                    <label>Ссылка на картинку (URL):</label>
-                    <input type="text" name="image_url" required placeholder="https://images.unsplash.com/...">
+                    <!-- ЗАМЕНЕНО: вместо текстовой ссылки теперь выбор файла с устройства/галереи -->
+                    <label>Фото товара (из галереи / устройства):</label>
+                    <input type="file" name="image_file" accept="image/*" required style="width:100%; padding:10px; margin:6px 0 14px 0; background:#ffffff; border:1px solid var(--border-color); border-radius:8px; box-sizing: border-box;">
 
                     <button type="submit" class="btn-add">Добавить товар в каталог</button>
                 </form>
