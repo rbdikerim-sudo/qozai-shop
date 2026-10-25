@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ settings.shop_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- Контейнер для всплывающих уведомлений -->
+    <div id="toastContainer"></div>
+
+    <div class="store-container">
+        <!-- Шапка сайта -->
+        <header class="store-header">
+            <h1 class="logo-title"><a href="/" style="text-decoration:none; color:inherit;">{{ settings.shop_name }}</a></h1>
+            <div class="header-nav">
+                <!-- 💬 Возвращенная кнопка Поддержка -->
+                <a href="https://t.me/{{ settings.telegram_user }}" target="_blank" class="nav-btn">💬 Поддержка</a>
+                
+                <a href="{{ settings.gis_link }}" target="_blank" class="nav-btn">📍 Адрес</a>
+                
+                <!-- Кнопка Отзывы -->
+                {% if has_access %}
+                    <a href="/reviews" class="nav-btn">⭐ Отзывы</a>
+                {% else %}
+                    <a href="#" onclick="showAccessAlert()" class="nav-btn">⭐ Отзывы</a>
+                {% endif %}
+
+                <a href="/cart" class="nav-btn cart-btn">🛒 Корзина <span class="cart-badge" id="cartCount">0</span></a>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <div class="main-layout">
+            <!-- Сайдбар категорий -->
+            <aside class="sidebar-categories">
+                <h3>Категории</h3>
+                <ul>
+                    {% for cat in categories %}
+                        <li>
+                            <a href="/?category={{ cat }}" class="{% if current_cat == cat %}active{% endif %}">
+                                {{ cat }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </aside>
+
+            <!-- Каталог товаров -->
+            <main class="catalog-grid">
+                {% if products %}
+                    {% for p in products %}
+                        <div class="product-card" onclick='showDetails({{ p | tojson | safe }})'>
+                            <div class="card-img-wrap">
+                                <span class="card-badge-code">{{ p.code }}</span>
+                                <img src="{{ p.image_url }}" alt="{{ p.name }}">
+                            </div>
+                            <div class="card-info">
+                                <span class="card-category">{{ p.category }}</span>
+                                <h4>{{ p.name }}</h4>
+                                <p class="price">{{ "{:,.0f}".format(p.price).replace(",", " ") }} ₸</p>
+                                
+                                <!-- Динамический рейтинг -->
+                                <div style="font-size: 12px; color: #f59e0b; margin-top: 4px;">
+                                    {% if p.rating %}
+                                        ⭐ <b>{{ p.rating }}</b> <span style="color: #6b7280;">({{ p.reviews_count }} отз.)</span>
+                                    {% else %}
+                                        <span style="color: #9ca3af; font-style: italic;">Нет отзывов</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-products">
+                        <p>В этой категории пока нет товаров.</p>
+                        <a href="/">Показать все товары</a>
+                    </div>
+                {% endif %}
+            </main>
+
+            <!-- Правая панель с детализацией выбранного товара -->
+            <aside class="product-detail-panel" id="detailPanel">
+                <div class="placeholder-text">
+                    <div class="placeholder-icon">🧥</div>
+                    <p>Нажмите на карточку одежды в каталоге, чтобы изучить состав, цвета и размеры.</p>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        function showAccessAlert() {
+            alert("Раздел отзывов: доступен клиентам после покупки и администратору.");
+        }
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Корзина — {{ settings.shop_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="store-container">
+        <!-- Шапка сайта -->
+        <header class="store-header">
+            <h1 class="logo-title"><a href="/" style="text-decoration:none; color:inherit;">{{ settings.shop_name }}</a></h1>
+            
+            <div class="header-nav">
+                <a href="/" class="nav-btn" style="border-radius: 8px; padding: 8px 16px;">← На главную</a>
+            </div>
+        </header>
+
+        <!-- Основной макет корзины -->
+        <div class="cart-layout">
+            <!-- Левая часть: Список товаров в корзине с чекбоксами -->
+            <div class="cart-items-container">
+                <h2>Ваша корзина</h2>
+                <div id="cartItemsList">
+                    <!-- Сюда JavaScript динамически загрузит товары из localStorage -->
+                </div>
+            </div>
+
+            <!-- Правая часть: Итоговая сумма и оформление -->
+            <div class="cart-summary-panel">
+                <h3>Ваш заказ</h3>
+                <div class="summary-row">
+                    <span>Выбрано товаров:</span>
+                    <span id="selectedCount">0 шт.</span>
+                </div>
+                <div class="summary-row total-row">
+                    <span>Общая сумма:</span>
+                    <span id="totalPrice">0 ₸</span>
+                </div>
+                <button class="btn-checkout" onclick="proceedToCheckout()">Оформить выбранное</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+</body>
+</html>

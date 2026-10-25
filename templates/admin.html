@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель администратора — {{ settings.shop_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <a href="/" class="back-link" style="margin-bottom:0;">← Вернуться на сайт</a>
+            <a href="/admin-logout" class="btn-delete" style="text-decoration:none; padding: 8px 16px;">Выйти из админки</a>
+        </div>
+
+        <h2 style="margin-top: 0; color: var(--text-main);">⚙️ Управление магазином и безопасность</h2>
+
+        <!-- Уведомления (Flash messages) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; background: {% if category == 'error' %}#fee2e2; color: #dc2626;{% else %}#d1fae5; color: #065f46;{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="admin-grid">
+            <!-- Настройки магазина и Telegram -->
+            <div class="admin-card">
+                <h2>Настройки магазина и Telegram</h2>
+                <form method="POST">
+                    <input type="hidden" name="action" value="update_settings">
+                    
+                    <label>Название магазина:</label>
+                    <input type="text" name="shop_name" value="{{ settings.shop_name }}" required>
+
+                    <label>Telegram username (для поддержки):</label>
+                    <input type="text" name="telegram_user" value="{{ settings.telegram_user }}" required>
+
+                    <label>Ссылка 2GIS:</label>
+                    <input type="text" name="gis_link" value="{{ settings.gis_link }}" required>
+
+                    <label>Ссылка Kaspi Pay:</label>
+                    <input type="text" name="kaspi_link" value="{{ settings.kaspi_link }}" required>
+
+                    <label>Токен Telegram бота:</label>
+                    <input type="text" name="telegram_bot_token" value="{{ settings.telegram_bot_token }}" required>
+
+                    <label>Admin Chat ID (куда летят заказы):</label>
+                    <input type="text" name="admin_chat_id" value="{{ settings.admin_chat_id }}" required>
+
+                    <button type="submit" class="btn-save">Сохранить настройки</button>
+                </form>
+            </div>
+
+            <!-- Смена пароля администратора -->
+            <div class="admin-card">
+                <h2>🔒 Безопасность (Смена пароля)</h2>
+                <form method="POST">
+                    <input type="hidden" name="action" value="update_password">
+
+                    <label>Старый пароль:</label>
+                    <input type="password" name="old_password" placeholder="Введите текущий пароль" required>
+
+                    <label>Новый пароль:</label>
+                    <input type="password" name="new_password" placeholder="Введите новый пароль" required>
+
+                    <label>Подтвердите новый пароль:</label>
+                    <input type="password" name="confirm_password" placeholder="Повторите новый пароль" required>
+
+                    <button type="submit" class="btn-save" style="margin-top: 15px;">Изменить пароль</button>
+                </form>
+            </div>
+
+            <!-- Добавление товара -->
+            <div class="admin-card full-width">
+                <h2>Добавить новый товар</h2>
+                <form method="POST">
+                    <input type="hidden" name="action" value="add_product">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label>Название товара:</label>
+                            <input type="text" name="name" required placeholder="Например: Премиальное худи">
+                        </div>
+                        <div>
+                            <label>Категория:</label>
+                            <select name="category" required style="width:100%; padding:10px; margin:6px 0 14px 0; background:#ffffff; border:1px solid var(--border-color); border-radius:8px;">
+                                <option value="Верхняя одежда">Верхняя одежда</option>
+                                <option value="Нижняя одежда">Нижняя одежда</option>
+                                <option value="Шапки">Шапки</option>
+                                <option value="Обувь">Обувь</option>
+                                <option value="Аксессуары">Аксессуары</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label>Цена (₸):</label>
+                            <input type="number" step="any" name="price" required placeholder="34990">
+                        </div>
+                        <div>
+                            <label>Цвета (через запятую):</label>
+                            <input type="text" name="colors" required placeholder="Черный, Белый, Хаки">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label>Размеры EN (S, M, L...):</label>
+                            <input type="text" name="sizes_en" required placeholder="S, M, L, XL">
+                        </div>
+                        <div>
+                            <label>Размеры RU (44, 46, 48...):</label>
+                            <input type="text" name="sizes_ru" required placeholder="44, 46, 48, 50">
+                        </div>
+                    </div>
+
+                    <label>Состав ткани:</label>
+                    <input type="text" name="composition" required placeholder="Хлопок 90%, Полиэстер 10%">
+
+                    <label>Ссылка на картинку (URL):</label>
+                    <input type="text" name="image_url" required placeholder="https://images.unsplash.com/...">
+
+                    <button type="submit" class="btn-add">Добавить товар в каталог</button>
+                </form>
+            </div>
+
+            <!-- Список существующих товаров -->
+            <div class="admin-card full-width">
+                <h2>Список товаров в каталоге</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Код</th>
+                            <th>Фото</th>
+                            <th>Название</th>
+                            <th>Категория</th>
+                            <th>Цена</th>
+                            <th>Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in products %}
+                        <tr>
+                            <td><b>{{ p.code }}</b></td>
+                            <td><img src="{{ p.image_url }}" alt="" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;"></td>
+                            <td>{{ p.name }}</td>
+                            <td>{{ p.category }}</td>
+                            <td>{{ "{:,.0f}".format(p.price).replace(",", " ") }} ₸</td>
+                            <td>
+                                <form method="POST" style="display:inline;">
+                                    <input type="hidden" name="action" value="delete_product">
+                                    <input type="hidden" name="product_id" value="{{ p.id }}">
+                                    <button type="submit" class="btn-delete" onclick="return confirm('Удалить этот товар?')">Удалить</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

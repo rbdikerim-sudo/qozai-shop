@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход в админку</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body style="display:flex; justify-content:center; align-items:center; height:100vh;">
+    <div style="background:white; padding:30px; border-radius:12px; border:1px solid #e2e8f0; width:300px;">
+        <h3>Вход в админку QOZAI</h3>
+        {% if error %}<p style="color:red; font-size:12px;">{{ error }}</p>{% endif %}
+        <form method="POST">
+            <input type="password" name="password" placeholder="Введите пароль" required style="width:100%; padding:10px; margin:10px 0; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
+            <button type="submit" class="btn-save">Войти</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Отзывы покупателей — {{ settings.shop_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="admin-body">
+    <div class="admin-container" style="max-width: 900px;">
+        <a href="/" class="back-link">← Вернуться в магазин</a>
+        
+        <h2 style="margin-top: 0; color: var(--text-main);">⭐ Отзывы покупателей</h2>
+        
+        <!-- Сообщения Flask -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; background: {% if category == 'error' %}#fee2e2; color: #dc2626;{% else %}#d1fae5; color: #065f46;{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Форма добавления отзыва (доступна только для купленных товаров) -->
+        {% if allowed_products %}
+            <div class="admin-card" style="margin-bottom: 30px; background: #f8fafc;">
+                <h3 style="margin-top: 0; font-size: 16px; margin-bottom: 15px;">Оставить отзыв на купленный товар</h3>
+                <form method="POST">
+                    <div class="form-group">
+                        <label>Выберите купленный товар:</label>
+                        <select name="product_code" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: white;">
+                            {% for item in allowed_products %}
+                                <option value="{{ item.code }}">{{ item.name }} (Код: {{ item.code }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-grid-3" style="grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                        <div class="form-group">
+                            <label>Ваше имя:</label>
+                            <input type="text" name="author" required placeholder="Иван" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        </div>
+                        <div class="form-group">
+                            <label>Оценка (от 1 до 5):</label>
+                            <select name="rating" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: white;">
+                                <option value="5">⭐⭐⭐⭐⭐ (5 - Отлично)</option>
+                                <option value="4">⭐⭐⭐⭐ (4 - Хорошо)</option>
+                                <option value="3">⭐⭐⭐ (3 - Нормально)</option>
+                                <option value="2">⭐⭐ (2 - Плохо)</option>
+                                <option value="1">⭐ (1 - Ужасно)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>Ваш комментарий:</label>
+                        <textarea name="comment" rows="3" required placeholder="Качество ткани отличное, размер подошел идеально..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); box-sizing: border-box;"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-save" style="margin-top: 15px;">Опубликовать отзыв</button>
+                </form>
+            </div>
+        {% else %}
+            <div style="background: #fffbeb; border: 1px solid #fef3c7; padding: 15px; border-radius: 8px; margin-bottom: 30px; font-size: 13px; color: #b45309;">
+                ℹ️ Вы еще не оформили ни одного заказа, поэтому форма добавления отзывов пока скрыта. Сделайте заказ, чтобы получить возможность оставлять оценки!
+            </div>
+        {% endif %}
+
+        <!-- Список всех отзывов -->
+        <h3>Все отзывы</h3>
+        <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+            {% if reviews %}
+                {% for rev in reviews %}
+                    <div style="background: white; border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; display: flex; gap: 20px; align-items: flex-start;">
+                        <img src="{{ rev.image_url }}" alt="" style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div style="flex-grow: 1;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <h4 style="margin: 0; font-size: 15px; color: var(--text-main);">{{ rev.author }} <span style="font-size: 12px; color: var(--text-muted); font-weight: normal;">(Товар: {{ rev.product_name }})</span></h4>
+                                <span style="font-size: 13px; color: #f59e0b;">{'⭐' * rev.rating}</span>
+                            </div>
+                            <p style="margin: 0; font-size: 14px; color: var(--text-main); line-height: 1.5;">{{ rev.comment }}</p>
+                            <small style="display: block; margin-top: 8px; color: var(--text-muted); font-size: 11px;">Дата: {{ rev.created_at }}</small>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: var(--text-muted); text-align: center; padding: 40px;">Пока нет ни одного отзыва. Будьте первыми!</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

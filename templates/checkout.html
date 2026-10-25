@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Оформление заказа — {{ settings.shop_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- Модальное окно с важной информацией при входе -->
+    <div id="infoModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>⚠️ Важная информация</h3>
+            <p>Уважаемый клиент, пожалуйста, внимательно введите и проверьте свои данные. Заказ отправляется по Казахстану через КазПочту (а по г. Алматы — курьерской службой). Пожалуйста, загружайте корректный чек об оплате в формате PDF, в противном случае заказ не будет обработан. Если вам потребуется помощь, обратитесь в службу поддержки. Спасибо за внимание!</p>
+            <button class="btn-save" onclick="closeInfoModal()">Понятно, продолжить</button>
+        </div>
+    </div>
+
+    <!-- Контейнер для всплывающих уведомлений -->
+    <div id="toastContainer"></div>
+
+    <div class="store-container">
+        <!-- Шапка сайта -->
+        <header class="store-header">
+            <h1 class="logo-title"><a href="/" style="text-decoration:none; color:inherit;">{{ settings.shop_name }}</a></h1>
+            <div class="header-nav">
+                <a href="/cart" class="nav-btn" style="border-radius: 8px; padding: 8px 16px;">← В корзину</a>
+            </div>
+        </header>
+
+        <!-- Макет оформления заказа -->
+        <div class="checkout-layout">
+            <!-- Левая колонка: Форма данных клиента -->
+            <div class="checkout-form-container">
+                <h2>Оформление заказа</h2>
+                <form id="orderForm" onsubmit="submitOrder(event)">
+                    
+                    <div class="form-group">
+                        <label>ФИО (Полное имя):</label>
+                        <input type="text" id="fullName" required placeholder="Иванов Иван Иванович">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Место проживания (адрес до мелочей: город, улица, дом, квартира, подъезд):</label>
+                        <textarea id="address" rows="3" required placeholder="г. Алматы, ул. Абая 15, кв. 42"></textarea>
+                    </div>
+
+                    <h3 style="font-size: 14px; margin: 20px 0 10px 0; color: var(--text-main);">Контакты (обязательно укажите хотя бы один способ связи):</h3>
+                    
+                    <div class="form-grid-3">
+                        <div class="form-group">
+                            <label>WhatsApp номер:</label>
+                            <input type="text" id="whatsapp" placeholder="+7 777 123 45 67">
+                        </div>
+                        <div class="form-group">
+                            <label>Instagram аккаунт:</label>
+                            <input type="text" id="instagram" placeholder="@username">
+                        </div>
+                        <div class="form-group">
+                            <label>Telegram аккаунт:</label>
+                            <input type="text" id="telegram" placeholder="@username">
+                        </div>
+                    </div>
+
+                    <!-- Оплата через Kaspi -->
+                    <div class="payment-box">
+                        <h3>Шаг 2: Оплата через Kaspi</h3>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
+                            Нажмите на кнопку ниже, чтобы перейти на Kaspi IP продавца и оплатить точную сумму. После оплаты скачайте официальный чек в формате PDF.
+                        </p>
+                        <a href="{{ settings.kaspi_link }}" target="_blank" class="btn-kaspi">💳 Оплатить через Kaspi Pay</a>
+                    </div>
+
+                    <!-- Загрузка чека -->
+                    <div class="form-group" style="margin-top: 25px;">
+                        <label>Загрузите официальный чек об оплате (Строго в формате PDF):</label>
+                        <input type="file" id="receiptFile" accept=".pdf" required style="padding: 10px; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; width: 100%;">
+                        <small style="color: var(--text-muted);">Система проверяет наличие фискальных признаков Kaspi (РНМ, ЗНМ, ФП).</small>
+                    </div>
+
+                    <button type="submit" class="btn-checkout" id="submitBtn" style="margin-top: 30px;">Завершить покупку</button>
+                </form>
+
+                <!-- Сообщение об успешной отправке -->
+                <div id="successMessage" class="success-box" style="display: none;">
+                    <h2>🎉 Ваш заказ успешно отправлен продавцу!</h2>
+                    <p>Спасибо за покупку! Продавец уже получил ваш заказ и проверенный чек в Telegram, скоро с вами свяжутся.</p>
+                    <a href="/" class="btn-save" style="display:inline-block; margin-top:20px; text-decoration:none; text-align:center;">Вернуться в магазин</a>
+                </div>
+            </div>
+
+            <!-- Правая колонка: Сводка выбранных товаров -->
+            <div class="checkout-summary-panel">
+                <h3>Ваш заказ</h3>
+                <div id="checkoutItemsList" style="max-height: 350px; overflow-y: auto; margin-bottom: 20px;">
+                    <!-- Сюда JS подгрузит выбранные в корзине товары -->
+                </div>
+                <div class="summary-row total-row">
+                    <span>К оплате:</span>
+                    <span id="checkoutTotalPrice">0 ₸</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/checkout.js') }}"></script>
+</body>
+</html>
