@@ -530,7 +530,7 @@ def admin_panel():
       sizes_ru = request.form.get("sizes_ru")
       code = f"CODE-{random.randint(10000, 99999)}"
 
-      # ИЗМЕНЕНИЕ: Обработка загрузки файла фото из устройства вместо текстовой ссылки
+      # Обработка загрузки файла фото из устройства
       image_url = ""
       if "image_file" in request.files:
         file = request.files["image_file"]
@@ -586,13 +586,7 @@ def admin_logout():
   return redirect("/")
 
 
-app = Flask(__name__)
-app.secret_key = "qozai_secret_key_super_secure"
-DATABASE = "database.db"
-UPLOAD_FOLDER = "static/uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-# СРАЗУ ЗАПУСКАЕМ ИНИЦИАЛИЗАЦИЮ БАЗЫ (теперь она сработает и на Render, и локально)
+# Инициализация базы данных при старте сервера (нужно для Render/Gunicorn)
 init_db()
 
 
